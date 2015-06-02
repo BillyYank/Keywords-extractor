@@ -13,5 +13,5 @@ void Word::toLowCase() {
 
 bool Word::operator ==(Word &word) {
 	//TODO
-	return true;
+	return (string)(*this) == (string)word;
 }

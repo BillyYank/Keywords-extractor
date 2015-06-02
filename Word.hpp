@@ -2,7 +2,7 @@
 
 using namespace std;
 
-class Word : string {
+class Word : public string {
 public:
 	bool operator ==(Word &word);
 	void toLowCase();
