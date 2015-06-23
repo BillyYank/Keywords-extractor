@@ -1,4 +1,3 @@
-#include "Word.hpp"
 #include<iostream>
 #include "porter2_stemmer.h"
 
