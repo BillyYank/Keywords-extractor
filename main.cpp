@@ -1,10 +1,15 @@
 #include "Word.hpp"
 #include<iostream>
+#include "porter2_stemmer.h"
 
 using namespace std;
 
 int main() {
-	Word w1, w2;
-	cin >> w1 >> w2;
-	cout << (w1 == w2);
+
+	string word;
+	while(1) {
+		cin >> word;
+		Porter2Stemmer::stem(word);
+		cout << word << "\n";		
+	}
 }
