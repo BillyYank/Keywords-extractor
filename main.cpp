@@ -1,14 +1,24 @@
 #include<iostream>
-#include "porter2_stemmer.h"
+#include<tuple>
+#include<fstream>
+#include "Helper.hpp"
+#include<map>
+#include<algorithm>
 
 using namespace std;
 
 int main() {
 
-	string word;
-	while(1) {
-		cin >> word;
-		Porter2Stemmer::stem(word);
-		cout << word << "\n";		
-	}
+	string nameIn, nameOut;
+	cin >> nameIn >> nameOut;
+
+	ifstream in;
+	ofstream out;
+	in.open(nameIn);
+	out.open(nameOut);
+	
+	Helper helper(in);
+	helper.help();
+	helper.print_co_o();
+
 }

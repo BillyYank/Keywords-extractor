@@ -30,6 +30,8 @@
  * SOFTWARE.
  */
 
+#include <stdio.h>
+#include <ctype.h>
 #include <algorithm>
 #include <utility>
 #include <iostream>
@@ -52,6 +54,14 @@ void Porter2Stemmer::stem(std::string& word)
     if (word[0] == '\'')
         word = word.substr(1, word.size() - 1);
 
+    //remove trash from string
+    for(int i = 0; i < word.length();)
+	    if(!isalpha(word[i])){
+	    	word.erase(word.begin() + i);
+	    }else{
+	    	++i;
+	    }
+
     if (special(word))
         return;
 
@@ -66,6 +76,7 @@ void Porter2Stemmer::stem(std::string& word)
         std::replace(word.begin(), word.end(), 'Y', 'y');
         return;
     }
+
 
     step1B(word, startR1);
     step1C(word);
