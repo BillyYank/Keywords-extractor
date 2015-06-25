@@ -6,8 +6,12 @@
 
 using namespace std;
 
-set<string> nonTerms = {"a","the","to","in","from","out","was","have","has","were","would","will","if","then","of","off","after","over","into","up"}; 
+set<string> nonTerms = {"a","the","and","for","to","in","from","out","are","is","was","have","has","were","would","will","if","then","of","off","after","over","into","up"}; 
 set<char> endPoints = {'.','!','?'};
+
+bool notTerm(string& word) {
+	return word.length() < 3 || nonTerms.find(word) != nonTerms.end();
+}
 
 int pairwiseCooc(vector<int>& a, vector<int>& b) {
 	int i = 0, j = 0, res = 0;
@@ -47,8 +51,8 @@ Helper::Helper(ifstream& _input) : input(_input) {
 
 }
 
+// vector with sentences numbers with word occurence
 void Helper::makeFreqVect() {
-	vector<int> termsInSent;
 	int sentNum = 0;
 	while(!input.eof()){
 		bool endOfSent = false;
@@ -59,10 +63,9 @@ void Helper::makeFreqVect() {
 			endOfSent = true;
 		}
 		
-		if(nonTerms.find(word) == nonTerms.end()){
-			Porter2Stemmer::stem(word);
+		Porter2Stemmer::stem(word);
+		if(!notTerm(word))
 			freq[word].push_back(sentNum);
-		}
 
 		if(endOfSent) 
 			++sentNum;
@@ -80,7 +83,7 @@ void Helper::makeCoocMatrix() {
 		return a.second > b.second;	
 	});
 
-	int edge = 10;//= min(1000, 0.3*freq.size());
+	int edge = 0.3*freq.size();  // Number of frequent terms
 
 	//making co_o matrix
 	for(int i = 0; i < edge; ++i) {
@@ -104,7 +107,7 @@ void Helper::help() {
 
 void Helper::print_co_o() {
 	for(auto it = freq.begin(); it != freq.end(); ++it) {
-		cout << it->first << " ";
+		cout << it->first << " " << it->first.length() << " ";
 		for(int i = 0; i < (it->second).size(); ++i) 
 			cout << it->second[i] << " ";
 		cout << "\n";
