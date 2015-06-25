@@ -77,13 +77,15 @@ void Helper::makeCoocMatrix() {
 	//choosing frequent terms
 	vector<pair<string, int> > tmpFreq;
 	for(auto it = freq.begin(); it != freq.end(); ++it) {
-		tmpFreq.push_back(pair<string, int>(it->first, (it->second).size() ) );
+		if(it->second.size() > 3) {
+			tmpFreq.push_back(pair<string, int>(it->first, it->second.size() ) );
+		}
 	}
 	sort(tmpFreq.begin(), tmpFreq.end(), [](const pair<string, int> &a, const pair<string, int> &b) -> bool {
 		return a.second > b.second;	
 	});
 
-	int edge = 0.3*freq.size();  // Number of frequent terms
+	int edge = 0.3*tmpFreq.size();  // Number of frequent terms
 
 	//making co_o matrix
 	for(int i = 0; i < edge; ++i) {
@@ -91,9 +93,9 @@ void Helper::makeCoocMatrix() {
 			string term1 = tmpFreq[i].first;
 			string term2 = tmpFreq[j].first;
 			if(i == j) {
-				co_o[pair<string, string>(term1, term2)] = 0;
+				co_o[{term1, term2}] = 0;
 			} else {
-				co_o[pair<string, string>(term1, term2)] = pairwiseCooc(freq[term1], freq[term2]);
+				co_o[{term1, term2}] = pairwiseCooc(freq[term1], freq[term2]);
 			}
 		}
 	}

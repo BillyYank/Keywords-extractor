@@ -10,12 +10,12 @@ using namespace std;
 int main() {
 
 	string nameIn, nameOut;
-	cin >> nameIn >> nameOut;
+	cin >> nameIn;
 
 	ifstream in;
-	ofstream out;
+	//ofstream out;
 	in.open(nameIn);
-	out.open(nameOut);
+	//out.open(nameOut);
 	
 	Helper helper(in);
 	helper.help();
