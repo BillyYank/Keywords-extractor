@@ -2,22 +2,36 @@
 #include<fstream>
 #include<vector>
 #include<map>
+#include<set>
 /*
 Steme, find phrases, extract frequent terms, create cooccurence matrix
 */
 using namespace std;
 
+struct freqInfo{
+	set<int> sntses;
+	int num = 0; //??
+};
+
 class Helper {
 public:
-	Helper(ifstream& _input);
+	Helper(ifstream& input);
 	void help();
-	void print_co_o();
+	void printPairCooc();
+
+protected:
+	map<string, double> termsProb;
+	map<string, int> totalCooc;
+	map<pair<string, string>, int> pairCooc;
+	vector<pair<string, int>> freqTerms;
 private:
 	ifstream& input;
-	map<string, vector<int> > freq;
-	map<pair<string, string>, int> co_o;
+	map<string, freqInfo> sentWithTerm;
+	vector<int> sentSize;
+	int nTotal;
 
-	void makeFreqVect();
+	void makeSentWithTerm();
 	void chooseFreq();
-	void makeCoocMatrix();
+	void makePairCooc();
+	void makeTermsProbAndTotalCooc();
 };

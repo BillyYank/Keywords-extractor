@@ -19,6 +19,6 @@ int main() {
 	
 	Helper helper(in);
 	helper.help();
-	helper.print_co_o();
+	helper.printPairCooc();
 
 }

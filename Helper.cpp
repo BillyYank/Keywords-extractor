@@ -13,33 +13,21 @@ bool notTerm(string& word) {
 	return word.length() < 3 || nonTerms.find(word) != nonTerms.end();
 }
 
-int pairwiseCooc(vector<int>& a, vector<int>& b) {
-	int i = 0, j = 0, res = 0;
-	while(i < a.size() && j < b.size()) {
-		if(i+1 < a.size()){
-			if(a[i] == a[i+1]){
-				++i;
-				continue;
-			}
-		}
-
-		if(j+1 < b.size()){
-			if(b[j] == b[j+1]) {
-				++j;
-				continue;
-			}
-		}
-
-		if(a[i] == b[j]) {
-			++i;
-			++j;
+int pairwiseCooc(set<int>& a, set<int>& b) {
+	auto it = a.begin();
+	auto jt = b.begin();
+	int res = 0;
+	while(it != a.end() && jt != b.end()) {
+		if(*it == *jt) {
+			++it;
+			++jt;
 			++res;
 			continue;
-		} else if(a[i] < b[j]) {
-			++i;
+		} else if(*it < *jt) {
+			++it;
 			continue;
 		} else {
-			++j;
+			++jt;
 			continue;
 		}
 	}
@@ -47,76 +35,88 @@ int pairwiseCooc(vector<int>& a, vector<int>& b) {
 }
 
 
-Helper::Helper(ifstream& _input) : input(_input) {
-
+Helper::Helper(ifstream& input) : input(input) {
+	nTotal = 0;
 }
 
 // vector with sentences numbers with word occurence
-void Helper::makeFreqVect() {
+void Helper::makeSentWithTerm() {
 	int sentNum = 0;
-	while(!input.eof()){
-		bool endOfSent = false;
-		string word;
-		input >> word;
+	sentSize.push_back(0);
+	string word;
+	while(input >> word){
+		bool endOfSent = endPoints.find(word.back()) != endPoints.end();
 
-		if(endPoints.find(word.back()) != endPoints.end()) {
-			endOfSent = true;
-		}
-		
 		Porter2Stemmer::stem(word);
-		if(!notTerm(word))
-			freq[word].push_back(sentNum);
+		sentWithTerm[word].sntses.insert(sentNum);
+		sentWithTerm[word].num++;
+		sentSize[sentNum]++;
+		nTotal++;
 
-		if(endOfSent) 
-			++sentNum;
+		if(endOfSent){
+			 ++sentNum;
+			 sentSize.push_back(0);
+		}
 	}
 }
 
-void Helper::makeCoocMatrix() {
-
-	//choosing frequent terms
-	vector<pair<string, int> > tmpFreq;
-	for(auto it = freq.begin(); it != freq.end(); ++it) {
-		if(it->second.size() > 3) {
-			tmpFreq.push_back(pair<string, int>(it->first, it->second.size() ) );
-		}
+// choose frequents
+void Helper::chooseFreq() {
+	for(auto& word : sentWithTerm) {
+		freqTerms.push_back({word.first, word.second.num});
 	}
-	sort(tmpFreq.begin(), tmpFreq.end(), [](const pair<string, int> &a, const pair<string, int> &b) -> bool {
-		return a.second > b.second;	
-	});
 
-	int edge = 0.3*tmpFreq.size();  // Number of frequent terms
+	sort(freqTerms.begin(), freqTerms.end(), [](const pair<string, int> &a, const pair<string, int> &b) -> bool {
+			return a.second > b.second;	
+			});
+
+	int edge = 0.3*freqTerms.size();  // Number of frequent terms
+	freqTerms.resize(edge);
+}
+
+// makes co-occurence matrix of frequent terms
+void Helper::makePairCooc() {
 
 	//making co_o matrix
-	for(int i = 0; i < edge; ++i) {
-		for(int j = 0; j < edge; ++j) {
-			string term1 = tmpFreq[i].first;
-			string term2 = tmpFreq[j].first;
-			if(i == j) {
-				co_o[{term1, term2}] = 0;
+	for(auto& term1 : freqTerms) {
+		for(auto& term2 : freqTerms) {
+			if(term1.first == term2.first) {
+				pairCooc[{term1.first, term2.first}] = 0;
 			} else {
-				co_o[{term1, term2}] = pairwiseCooc(freq[term1], freq[term2]);
+				pairCooc[{term1.first, term2.first}] = pairwiseCooc(sentWithTerm[term1.first].sntses, sentWithTerm[term2.first].sntses);
 			}
 		}
 	}
 
 }
 
-void Helper::help() {
-	makeFreqVect();
-	makeCoocMatrix();
+// probability for each frequent term and terms number in sent with term
+void Helper::makeTermsProbAndTotalCooc() {
+	for(auto& term : freqTerms){
+		int count = 0;
+		for(int num : sentWithTerm[term.first].sntses) {
+			count += sentSize[num];			
+		}
+		termsProb[term.first] = (double)count/nTotal;
+		totalCooc[term.first] = count;
+	}
 }
 
-void Helper::print_co_o() {
-	for(auto it = freq.begin(); it != freq.end(); ++it) {
-		cout << it->first << " " << it->first.length() << " ";
-		for(int i = 0; i < (it->second).size(); ++i) 
-			cout << it->second[i] << " ";
-		cout << "\n";
+void Helper::help() {
+	makeSentWithTerm();
+	chooseFreq();
+	makePairCooc();
+	makeTermsProbAndTotalCooc();
+
+}
+
+void Helper::printPairCooc() {
+	for(auto it = freqTerms.begin(); it != freqTerms.end(); ++it) {
+		cout << it->first << " " << it->second << "\n";
 	}
 	cout << "\n" << "\n" << "\n" << "\n";
 
-	for(auto it = co_o.begin(); it != co_o.end(); ++it) {
+	for(auto it = pairCooc.begin(); it != pairCooc.end(); ++it) {
 		cout << (it->first).first << " " << (it->first).second << " " << it->second << "\n";
 	}
 }
