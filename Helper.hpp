@@ -14,6 +14,7 @@ struct freqInfo{
 };
 
 class Helper {
+friend class Extractor;
 public:
 	Helper(ifstream& input);
 	void help();

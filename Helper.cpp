@@ -45,17 +45,20 @@ void Helper::makeSentWithTerm() {
 	sentSize.push_back(0);
 	string word;
 	while(input >> word){
-		bool endOfSent = endPoints.find(word.back()) != endPoints.end();
+		bool notTerm = nonTerms.find(word) != nonTerms.end() || word.length() < 3;
+		if(!notTerm){
+			bool endOfSent = endPoints.find(word.back()) != endPoints.end();
 
-		Porter2Stemmer::stem(word);
-		sentWithTerm[word].sntses.insert(sentNum);
-		sentWithTerm[word].num++;
-		sentSize[sentNum]++;
-		nTotal++;
+			Porter2Stemmer::stem(word);
+			sentWithTerm[word].sntses.insert(sentNum);
+			sentWithTerm[word].num++;
+			sentSize[sentNum]++;
+			nTotal++;
 
-		if(endOfSent){
-			 ++sentNum;
-			 sentSize.push_back(0);
+			if(endOfSent){
+				++sentNum;
+				sentSize.push_back(0);
+			}
 		}
 	}
 }

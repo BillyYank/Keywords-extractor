@@ -1,7 +1,7 @@
 #include<iostream>
 #include<tuple>
 #include<fstream>
-#include "Helper.hpp"
+#include "Extractor.hpp"
 #include<map>
 #include<algorithm>
 
@@ -9,16 +9,18 @@ using namespace std;
 
 int main() {
 
-	string nameIn, nameOut;
+	string nameIn;
 	cin >> nameIn;
 
+	double alpha;
+	cin >> alpha;
+
 	ifstream in;
-	//ofstream out;
 	in.open(nameIn);
-	//out.open(nameOut);
 	
 	Helper helper(in);
-	helper.help();
-	helper.printPairCooc();
+	Extractor extractor(helper, alpha);
+	extractor.extract();
+	extractor.printChi();
 
 }
