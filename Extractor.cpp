@@ -16,7 +16,7 @@ double Extractor::chi(string& term) {
 		double freq = helper.pairCooc[{fterm.first, term}];
 		res += pow((freq - pg*nomg), 2)/(pg*nomg);
 	}
-	return res;
+	return sqrt(res);
 }
 
 // compute chi of frequent terms and sort them
